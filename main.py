@@ -25,25 +25,19 @@ class IDCounter():
 
 class Password():
 
-    def __init__(self,password):
-        IDCounter.increment_counter(self)
-        self.id = IDCounter.get_id()
-        self.check_password(password)
-        self.hash = Password.get_hash(self.password)
-    def check_password(self,password):
+    def valid_password(password):
         if password_pattern.fullmatch(password):
-            print('Good password')
-            self.password = password
+            return True
         else:
             raise ValueError('Bad password')
     def get_hash(password):
          return hashlib.sha256(password.encode()).hexdigest()
-    def check_hash(self,password_to_check):
-        hash_to_check = Password.get_hash(password_to_check)
-        if self.hash == hash_to_check:
-            return True
-        else:
-            return False
+    # def check_hash(self,password_to_check):
+    #     hash_to_check = Password.get_hash(password_to_check)
+    #     if self.hash == hash_to_check:
+    #         return True
+    #     else:
+    #         return False
 
 
 
@@ -82,14 +76,13 @@ class User():
     def __init__(self, username, password):
         IDCounter.increment_counter(self)
         self.id = IDCounter.get_id()
-        if self.check_username(username):
+        if self.valid_username(username):
             self.__username = username
-        Password.check_password(self,password)
+        Password.valid_password(password)
         self.password = Password.get_hash(password)
 
-    def check_username(self,username):
+    def valid_username(self,username):
         if username_pattern.fullmatch(username):
-            print('Good username')
             return True
         else:
             raise ValueError("Bad username")
@@ -112,10 +105,7 @@ class Store():
     pass
 
 if __name__ == '__main__':
-    #создание и вывод просто для проверки
-
-    user1 = User('Kirill','tesT12345')
-    print(user1.__str__())
+    user1 = User('Kirill', 'testPassword42')
     #проверка создания продуктов через генератор
     random_tool_generator = item_generator.get_random_item()
     random_tools_list = [next(random_tool_generator) for _ in range(5)]

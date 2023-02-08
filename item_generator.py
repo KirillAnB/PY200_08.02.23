@@ -30,6 +30,7 @@ with open(TOOLS, 'r', encoding='utf8') as file:
             }
             yield random_tool
 
-random_tool_generator = get_random_item()
-random_tools_list = [next(random_tool_generator) for _ in range(5)]
-print(random_tools_list)
+# random_tool_generator = get_random_item()
+# random_tools_list = [next(random_tool_generator) for _ in range(5)]
+# for item in random_tools_list:
+#     print(item)

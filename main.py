@@ -8,8 +8,8 @@ from sys import argv
 # password = argv[1]
 
 #Шаблоны для проверки пароля и логина
-password_pattern = r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$"
-user_name_pattern = r"^(?=.{4,12}$)(?![_.-])(?!.*[_.]{2})[a-zA-Z0-9._-]+(?<![_.])$"
+password_pattern = re.compile(r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$")
+username_pattern = re.compile(r"^(?=.{4,12}$)(?![_.-])(?!.*[_.]{2})[a-zA-Z0-9._-]+(?<![_.])$")
 
 
 class IDCounter():
@@ -28,8 +28,14 @@ class Password():
     def __init__(self,password):
         IDCounter.increment_counter(self)
         self.id = IDCounter.get_id()
-        self.password = password
+        self.check_password(password)
         self.hash = Password.get_hash(self.password)
+    def check_password(self,password):
+        if password_pattern.fullmatch(password):
+            print('Good password')
+            self.password = password
+        else:
+            raise ValueError('Bad password')
     def get_hash(password):
          return hashlib.sha256(password.encode()).hexdigest()
     def check_hash(self,password_to_check):
@@ -76,8 +82,19 @@ class User():
     def __init__(self, username, password):
         IDCounter.increment_counter(self)
         self.id = IDCounter.get_id()
-        self.__username = username
+        if self.check_username(username):
+            self.__username = username
+        Password.check_password(self,password)
         self.password = Password.get_hash(password)
+
+    def check_username(self,username):
+        if username_pattern.fullmatch(username):
+            print('Good username')
+            return True
+        else:
+            raise ValueError("Bad username")
+
+
     @property
     def username(self):
         return self.__username
@@ -86,7 +103,7 @@ class User():
         self.__username = username
 
     def __str__(self):
-        return f'Пользователь с id {self.id}, имя {self.__username}, пароль {self.password}'
+        return f'Пользователь с id {self.id}, имя {self.__username}, пароль password1.'
 
     def __repr__(self):
         return f'{self.__class__.__name__}(username={self.__username!r}, password=password1)'
@@ -96,9 +113,12 @@ class Store():
 
 if __name__ == '__main__':
     #создание и вывод просто для проверки
-    item1 = Product('soap',100.0,10)
-    print(good1.__str__())
-    item2 = Product('soap2',150.0, 9)
-    print(good2)
-    user1 = User('Kirill','testpassword')
+
+    user1 = User('Kirill','tesT12345')
     print(user1.__str__())
+    #проверка создания продуктов через генератор
+    random_tool_generator = item_generator.get_random_item()
+    random_tools_list = [next(random_tool_generator) for _ in range(5)]
+    product_list = [Product(name=product_dict['item_name'], price=product_dict['item_price'],rating=product_dict['item_rating']) for product_dict in random_tools_list]
+    for obj in product_list:
+        print(obj)

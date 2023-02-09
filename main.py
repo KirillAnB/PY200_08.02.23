@@ -70,8 +70,25 @@ class Product:
 
 
 class Cart:
-    pass
+    def __init__(self):
+        self.user_cart = []
 
+    def put_to_cart(self,item):
+        if isinstance(item, Product):
+            self.user_cart.append(item)
+    def del_from_cart(self, item):
+        if item in self.user_cart:
+            self.user_cart.remove(item)
+        else:
+            raise ValueError('В корзине нет такого товара')
+    def show_cart(self):
+        if len(self.user_cart) > 0:
+            print("В корзине следующие товары:")
+            for item in self.user_cart:
+                print(item)
+        else:
+            print('Корзина пуста')
+        return True
 class User:
 
     def __init__(self, username, password):
@@ -116,3 +133,6 @@ if __name__ == '__main__':
     # Проверка работы методов класса Password
     Password.check_hash(user1,'testPassword42')
     # Password.check_hash(user1, 'wrongPassword')
+    cart1 = Cart()
+    cart1.put_to_cart(product_list[1])
+    print(cart1.show_cart())

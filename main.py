@@ -12,18 +12,17 @@ password_pattern = re.compile(r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8
 username_pattern = re.compile(r"^(?=.{4,12}$)(?![_.-])(?!.*[_.]{2})[a-zA-Z0-9._-]+(?<![_.])$")
 
 
-class IDCounter():
+class IDCounter:
     id = 0
-    def __init__(self):
-        self.increment_counter()
 
     @classmethod
     def get_id(cls):
         return cls.id
-    def increment_counter(self):
+    @staticmethod
+    def increment_counter():
         IDCounter.id += 1
 
-class Password():
+class Password:
 
     def valid_password(password):
         if password_pattern.fullmatch(password):
@@ -31,19 +30,21 @@ class Password():
         else:
             raise ValueError('Bad password')
     def get_hash(password):
-         return hashlib.sha256(password.encode()).hexdigest()
-    # def check_hash(self,password_to_check):
-    #     hash_to_check = Password.get_hash(password_to_check)
-    #     if self.hash == hash_to_check:
-    #         return True
-    #     else:
-    #         return False
+        if Password.valid_password(password):
+            return hashlib.sha256(password.encode()).hexdigest()
+    def check_hash(username, password):
+        if isinstance(username, User) and username.password == Password.get_hash(password):
+            print('Password accepted')
+            return True
+        else:
+            print("Password is not accepted, try again")
+            return False
 
 
 
-class Product():
+class Product:
     def __init__(self, name, price, rating):
-        IDCounter.increment_counter(self)
+        IDCounter.increment_counter()
         self.__id = IDCounter.get_id()
         self.__name = name
         if not isinstance(price, float):
@@ -68,13 +69,13 @@ class Product():
         return f'{self.__class__.__name__}(name={self.name!r}, price={self.price!r}, rating={self.rating!r})'
 
 
-class Cart():
+class Cart:
     pass
 
-class User():
+class User:
 
     def __init__(self, username, password):
-        IDCounter.increment_counter(self)
+        IDCounter.increment_counter()
         self.id = IDCounter.get_id()
         if self.valid_username(username):
             self.__username = username
@@ -100,7 +101,7 @@ class User():
 
     def __repr__(self):
         return f'{self.__class__.__name__}(username={self.__username!r}, password=password1)'
-class Store():
+class Store:
     """Конструктор для строительного магазина"""
     pass
 
@@ -112,3 +113,6 @@ if __name__ == '__main__':
     product_list = [Product(name=product_dict['item_name'], price=product_dict['item_price'],rating=product_dict['item_rating']) for product_dict in random_tools_list]
     for obj in product_list:
         print(obj)
+    # Проверка работы методов класса Password
+    Password.check_hash(user1,'testPassword42')
+    # Password.check_hash(user1, 'wrongPassword')

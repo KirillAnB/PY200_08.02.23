@@ -1,11 +1,8 @@
 import hashlib
+import random
 import re
 import item_generator
-from sys import argv
 
-#Для реализации с запуском через консоль
-# user = argv[0]
-# password = argv[1]
 
 #Шаблоны для проверки пароля и логина
 password_pattern = re.compile(r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$")
@@ -114,25 +111,39 @@ class User:
         self.__username = username
 
     def __str__(self):
-        return f'Пользователь с id {self.id}, имя {self.__username}, пароль password1.'
+        return f'Пользователь с id {self.id}, имя {self.__username}, пароль "password1".'
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(username={self.__username!r}, password=password1)'
-class Store:
+        return f'{self.__class__.__name__}(username={self.__username!r}, password="password1")'
+class Store(User, Cart):
     """Конструктор для строительного магазина"""
-    pass
+
+
+    def __init__(self, username, password, products):
+        super().__init__(username, password)
+        self.user_cart = []
+        self.products = products
+
+    def put_to_cart(self):
+        self.user_cart.append(random.choice(self.products))
+
+
+
 
 if __name__ == '__main__':
     user1 = User('Kirill', 'testPassword42')
     #проверка создания продуктов через генератор
     random_tool_generator = item_generator.get_random_item()
-    random_tools_list = [next(random_tool_generator) for _ in range(5)]
+    random_tools_list = [next(random_tool_generator) for _ in range(20)]
     product_list = [Product(name=product_dict['item_name'], price=product_dict['item_price'],rating=product_dict['item_rating']) for product_dict in random_tools_list]
-    for obj in product_list:
-        print(obj)
     # Проверка работы методов класса Password
     Password.check_hash(user1,'testPassword42')
     # Password.check_hash(user1, 'wrongPassword')
-    cart1 = Cart()
-    cart1.put_to_cart(product_list[1])
-    print(cart1.show_cart())
+    # cart1 = Cart()
+    # cart1.put_to_cart(product_list[1])
+    # print(cart1.show_cart())
+    shop1 = Store('Ivan','Password111', product_list)
+    print(shop1.username, shop1.user_cart, shop1.password, shop1.products)
+    shop1.put_to_cart()
+    print(shop1.user_cart)
+    print(shop1.password)

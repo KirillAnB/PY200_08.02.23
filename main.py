@@ -21,14 +21,17 @@ class IDCounter:
 
 class Password:
 
+    @staticmethod
     def valid_password(password):
         if password_pattern.fullmatch(password):
             return True
         else:
             raise ValueError('Bad password')
+    @staticmethod
     def get_hash(password):
         if Password.valid_password(password):
             return hashlib.sha256(password.encode()).hexdigest()
+    @staticmethod
     def check_hash(username, password):
         if isinstance(username, User) and username.password == Password.get_hash(password):
             print('Password accepted')
@@ -86,15 +89,17 @@ class Cart:
         else:
             print('Корзина пуста')
         return True
-class User:
+class User(Cart):
 
     def __init__(self, username, password):
+        super().__init__()
         IDCounter.increment_counter()
         self.id = IDCounter.get_id()
         if self.valid_username(username):
             self.__username = username
         Password.valid_password(password)
         self.password = Password.get_hash(password)
+
 
     def valid_username(self,username):
         if username_pattern.fullmatch(username):
@@ -115,17 +120,30 @@ class User:
 
     def __repr__(self):
         return f'{self.__class__.__name__}(username={self.__username!r}, password="password1")'
-class Store(User, Cart):
+class Store():
     """Конструктор для строительного магазина"""
 
 
-    def __init__(self, username, password, products):
-        super().__init__(username, password)
-        self.user_cart = []
-        self.products = products
+    def __init__(self, products):
+        self.users_list = [] #Инициализируем список пользователей при создании магазина.
+        self.products = products # Добавляем список продуктов, доступных в экземпляре магазина.
 
-    def put_to_cart(self):
-        self.user_cart.append(random.choice(self.products))
+    def add_new_user(self, username, password):
+        new_user = User(username, password)
+        self.users_list.append(new_user)
+
+    def show_shop_users(self):
+        return f"Shop user {self.users_list}"
+    def buy_item(self,username):
+        item_to_buy = (random.choice(self.products))
+        for user in self.users_list:
+            if user.username == username:
+                user.put_to_cart(item_to_buy)
+                user.show_cart()
+                return True
+        else:
+            raise ValueError(f'Покупатель с именем {username} не обнаружен.')
+
 
 
 
@@ -138,12 +156,8 @@ if __name__ == '__main__':
     product_list = [Product(name=product_dict['item_name'], price=product_dict['item_price'],rating=product_dict['item_rating']) for product_dict in random_tools_list]
     # Проверка работы методов класса Password
     Password.check_hash(user1,'testPassword42')
-    # Password.check_hash(user1, 'wrongPassword')
-    # cart1 = Cart()
-    # cart1.put_to_cart(product_list[1])
-    # print(cart1.show_cart())
-    shop1 = Store('Ivan','Password111', product_list)
-    print(shop1.username, shop1.user_cart, shop1.password, shop1.products)
-    shop1.put_to_cart()
-    print(shop1.user_cart)
-    print(shop1.password)
+    shop1 = Store(product_list)
+    shop1.add_new_user('Kirill', 'testPassword42')
+    shop1.add_new_user('Ivan', 'TestPassword42')
+    shop1.buy_item('Ivan')
+
